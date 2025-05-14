@@ -1,9 +1,16 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useApiKey } from "@/context/ApiKeyContext";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 const ApiKeyInput = () => {
@@ -24,20 +31,30 @@ const ApiKeyInput = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      {/* <DialogTrigger asChild>
         <Button 
           variant="outline" 
           className="absolute top-4 right-4 bg-chinese-white hover:bg-chinese-white/90 text-chinese-black border-chinese-brown"
         >
           {apiKey ? "更改API密钥" : "设置API密钥"}
         </Button>
-      </DialogTrigger>
+      </DialogTrigger> */}
       <DialogContent className="chinese-panel">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-heading text-chinese-red">设置 Runware API 密钥</DialogTitle>
+          <DialogTitle className="text-2xl font-heading text-chinese-red">
+            设置 Runware API 密钥
+          </DialogTitle>
           <DialogDescription className="text-chinese-black/80">
-            请输入您的 Runware API 密钥以使用图像生成功能。
-            您可以在 <a href="https://runware.ai/" target="_blank" rel="noopener noreferrer" className="text-chinese-red hover:text-chinese-brown underline">Runware.ai</a> 网站上获取您的 API 密钥。
+            请输入您的 Runware API 密钥以使用图像生成功能。 您可以在{" "}
+            <a
+              href="https://runware.ai/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-chinese-red hover:text-chinese-brown underline"
+            >
+              Runware.ai
+            </a>{" "}
+            网站上获取您的 API 密钥。
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,7 +67,9 @@ const ApiKeyInput = () => {
             required
           />
           <DialogFooter>
-            <Button type="submit" className="chinese-button">保存</Button>
+            <Button type="submit" className="chinese-button">
+              保存
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

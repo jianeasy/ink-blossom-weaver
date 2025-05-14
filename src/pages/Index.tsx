@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Brush, Loader2 } from "lucide-react";
@@ -8,22 +7,24 @@ import SubjectSelector from "@/components/SubjectSelector";
 import ParameterControls from "@/components/ParameterControls";
 import PaintingDisplay from "@/components/PaintingDisplay";
 import { useApiKey } from "@/context/ApiKeyContext";
-import { RunwareService } from "@/services/RunwareService";
 import { toast } from "sonner";
 import { buildChinesePaintingPrompt } from "@/utils/promptBuilder";
-import { 
-  ChinesePaintingOptions, 
-  PaintingStyle, 
-  PaintingSubject, 
-  PaintingParameters 
+import {
+  ChinesePaintingOptions,
+  PaintingStyle,
+  PaintingSubject,
+  PaintingParameters,
 } from "@/types/ChinesePainting";
+import { generateImageApi } from "@/request/api";
 
 const Index = () => {
   const { apiKey } = useApiKey();
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
+    null
+  );
   const [generatedPrompt, setGeneratedPrompt] = useState<string>("");
-  
+
   // Default painting options
   const [style, setStyle] = useState<PaintingStyle>("shuimo");
   const [subject, setSubject] = useState<PaintingSubject>("landscape");
@@ -32,7 +33,7 @@ const Index = () => {
     inkIntensity: 6,
     composition: "deep_far",
     paperColor: "象牙白 (Ivory)",
-    seasonalFeature: "autumn"
+    seasonalFeature: "autumn",
   });
 
   const getPaintingOptions = (): ChinesePaintingOptions => {
@@ -40,29 +41,29 @@ const Index = () => {
       style,
       subject,
       customSubject,
-      parameters
+      parameters,
     };
   };
 
   const generateImage = async () => {
-    if (!apiKey) {
-      toast.error("请先设置API密钥");
-      return;
-    }
-
     try {
       setIsLoading(true);
       const options = getPaintingOptions();
       const prompt = buildChinesePaintingPrompt(options);
       setGeneratedPrompt(prompt);
-      
-      const runwareService = new RunwareService(apiKey);
-      const result = await runwareService.generateImage({
-        positivePrompt: prompt,
-        model: "runware:100@1"
+      console.log("Generated prompt:", prompt);
+
+      const response = await generateImageApi({
+        inputs: {
+          prompt: prompt,
+        },
+        response_mode: "blocking",
+        user: "abc-123",
       });
-      
-      setGeneratedImageUrl(result.imageURL);
+      const image = response.data.outputs.imageUrl;
+      const imageUrl = JSON.parse(image)?.remote_url;
+
+      setGeneratedImageUrl(imageUrl);
       toast.success("国画创作完成！");
     } catch (error) {
       console.error("Image generation error:", error);
@@ -75,28 +76,35 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-16">
       <header className="text-center py-8 border-b border-chinese-red/30 relative animate-ink-flow">
-        <h1 className="text-4xl md:text-5xl font-heading text-chinese-red">国画生成器</h1>
-        <ApiKeyInput />
+        <h1 className="text-4xl md:text-5xl font-heading text-chinese-red">
+          国画生成器
+        </h1>
       </header>
 
       <main className="container px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-8 animate-ink-flow" style={{ animationDelay: "0.2s" }}>
+          <div
+            className="space-y-8 animate-ink-flow"
+            style={{ animationDelay: "0.2s" }}
+          >
             <StyleSelector value={style} onChange={setStyle} />
-            <SubjectSelector 
-              value={subject} 
+            <SubjectSelector
+              value={subject}
               onChange={setSubject}
               customSubject={customSubject}
               onCustomSubjectChange={setCustomSubject}
             />
-            <ParameterControls parameters={parameters} onChange={setParameters} />
-            
+            <ParameterControls
+              parameters={parameters}
+              onChange={setParameters}
+            />
+
             {!generatedImageUrl && (
               <div className="pt-4">
-                <Button 
+                <Button
                   className="chinese-button w-full text-lg py-6"
                   onClick={generateImage}
-                  disabled={isLoading || !apiKey}
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
@@ -113,18 +121,18 @@ const Index = () => {
               </div>
             )}
           </div>
-          
+
           <div className="animate-ink-flow" style={{ animationDelay: "0.4s" }}>
-            <PaintingDisplay 
-              imageUrl={generatedImageUrl} 
+            <PaintingDisplay
+              imageUrl={generatedImageUrl}
               prompt={generatedPrompt}
-              loading={isLoading} 
-              onGenerate={generateImage} 
+              loading={isLoading}
+              onGenerate={generateImage}
             />
           </div>
         </div>
       </main>
-      
+
       <footer className="text-center py-6 text-chinese-black/60 text-sm border-t border-chinese-red/30">
         <p>基于 AI 技术的国画生成器</p>
       </footer>
