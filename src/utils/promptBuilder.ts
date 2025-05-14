@@ -2,12 +2,19 @@
 import { ChinesePaintingOptions, translateStyle, translateSubject, translateComposition, translateSeason } from "../types/ChinesePainting";
 
 export const buildChinesePaintingPrompt = (options: ChinesePaintingOptions): string => {
-  const { style, subject, parameters } = options;
+  const { style, subject, customSubject, parameters } = options;
   const { inkIntensity, composition, paperColor, seasonalFeature } = parameters;
   
   // Base prompt structure
   let prompt = `Traditional Chinese painting (国画) in ${translateStyle(style)} style, `;
-  prompt += `depicting ${translateSubject(subject)}, `;
+  
+  // Use custom subject if provided, otherwise use predefined subject
+  if (customSubject && customSubject.trim() !== '') {
+    prompt += `depicting ${customSubject}, `;
+  } else {
+    prompt += `depicting ${translateSubject(subject)}, `;
+  }
+  
   prompt += `with ${translateComposition(composition)} composition, `;
   prompt += `${translateSeason(seasonalFeature)} season, `;
   
@@ -45,32 +52,34 @@ export const buildChinesePaintingPrompt = (options: ChinesePaintingOptions): str
       break;
   }
   
-  // Add subject-specific details
-  switch (subject) {
-    case "landscape":
-      prompt += "with mountains, water, mist, and small pavilions in distance, ";
-      break;
-    case "flower_bird":
-      prompt += "with elegant flowers and birds in harmonious composition, ";
-      break;
-    case "people":
-      prompt += "with traditional Chinese figures in classical poses and attire, ";
-      break;
-    case "animal":
-      prompt += "with animals portrayed in traditional Chinese artistic manner, ";
-      break;
-    case "bamboo":
-      prompt += "with bamboo stalks and leaves showing strength and flexibility, ";
-      break;
-    case "plum_blossom":
-      prompt += "with plum blossoms symbolizing resilience and hope, ";
-      break;
-    case "orchid":
-      prompt += "with orchids representing nobility and elegance, ";
-      break;
-    case "chrysanthemum":
-      prompt += "with chrysanthemums symbolizing integrity and longevity, ";
-      break;
+  // Add subject-specific details if no custom subject is provided
+  if (!customSubject || customSubject.trim() === '') {
+    switch (subject) {
+      case "landscape":
+        prompt += "with mountains, water, mist, and small pavilions in distance, ";
+        break;
+      case "flower_bird":
+        prompt += "with elegant flowers and birds in harmonious composition, ";
+        break;
+      case "people":
+        prompt += "with traditional Chinese figures in classical poses and attire, ";
+        break;
+      case "animal":
+        prompt += "with animals portrayed in traditional Chinese artistic manner, ";
+        break;
+      case "bamboo":
+        prompt += "with bamboo stalks and leaves showing strength and flexibility, ";
+        break;
+      case "plum_blossom":
+        prompt += "with plum blossoms symbolizing resilience and hope, ";
+        break;
+      case "orchid":
+        prompt += "with orchids representing nobility and elegance, ";
+        break;
+      case "chrysanthemum":
+        prompt += "with chrysanthemums symbolizing integrity and longevity, ";
+        break;
+    }
   }
   
   // Add seasonal elements

@@ -27,6 +27,7 @@ const Index = () => {
   // Default painting options
   const [style, setStyle] = useState<PaintingStyle>("shuimo");
   const [subject, setSubject] = useState<PaintingSubject>("landscape");
+  const [customSubject, setCustomSubject] = useState<string>("");
   const [parameters, setParameters] = useState<PaintingParameters>({
     inkIntensity: 6,
     composition: "deep_far",
@@ -38,6 +39,7 @@ const Index = () => {
     return {
       style,
       subject,
+      customSubject,
       parameters
     };
   };
@@ -74,7 +76,6 @@ const Index = () => {
     <div className="min-h-screen pb-16">
       <header className="text-center py-8 border-b border-chinese-red/30 relative animate-ink-flow">
         <h1 className="text-4xl md:text-5xl font-heading text-chinese-red">国画生成器</h1>
-        <h2 className="text-lg md:text-xl text-chinese-black/80 mt-2">Chinese Painting Generator</h2>
         <ApiKeyInput />
       </header>
 
@@ -82,7 +83,12 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-8 animate-ink-flow" style={{ animationDelay: "0.2s" }}>
             <StyleSelector value={style} onChange={setStyle} />
-            <SubjectSelector value={subject} onChange={setSubject} />
+            <SubjectSelector 
+              value={subject} 
+              onChange={setSubject}
+              customSubject={customSubject}
+              onCustomSubjectChange={setCustomSubject}
+            />
             <ParameterControls parameters={parameters} onChange={setParameters} />
             
             {!generatedImageUrl && (
@@ -120,7 +126,7 @@ const Index = () => {
       </main>
       
       <footer className="text-center py-6 text-chinese-black/60 text-sm border-t border-chinese-red/30">
-        <p>基于 AI 技术的国画生成器 | Chinese Painting Generator Powered by AI</p>
+        <p>基于 AI 技术的国画生成器</p>
       </footer>
     </div>
   );

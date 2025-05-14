@@ -2,6 +2,7 @@
 export interface ChinesePaintingOptions {
   style: PaintingStyle;
   subject: PaintingSubject;
+  customSubject?: string;
   parameters: PaintingParameters;
 }
 

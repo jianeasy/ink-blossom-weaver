@@ -25,7 +25,7 @@ const PaintingDisplay = ({ imageUrl, prompt, loading, onGenerate }: PaintingDisp
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-heading text-chinese-red">画作预览 (Preview)</h3>
+      <h3 className="text-xl font-heading text-chinese-red">画作预览</h3>
       
       <div className="rounded-md overflow-hidden border-4 border-chinese-brown bg-chinese-white min-h-[300px] flex items-center justify-center">
         {loading ? (
