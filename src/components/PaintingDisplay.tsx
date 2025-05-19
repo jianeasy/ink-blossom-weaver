@@ -1,16 +1,22 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brush, Download, Loader2 } from "lucide-react";
+import { Brush, Download, Loader2, BookmarkPlus, BookmarkCheck } from "lucide-react";
+import { toast } from "sonner";
+import { collectImageApi, cancelCollectImageApi } from "@/request/api";
 
 interface PaintingDisplayProps {
   imageUrl: string | null;
   prompt: string;
   loading: boolean;
   onGenerate: () => void;
+  imageId?: string;
 }
 
-const PaintingDisplay = ({ imageUrl, prompt, loading, onGenerate }: PaintingDisplayProps) => {
+const PaintingDisplay = ({ imageUrl, prompt, loading, onGenerate, imageId }: PaintingDisplayProps) => {
+  const [isCollected, setIsCollected] = useState(false);
+  const [collectLoading, setCollectLoading] = useState(false);
+
   const handleDownload = () => {
     if (!imageUrl) return;
     
@@ -21,6 +27,28 @@ const PaintingDisplay = ({ imageUrl, prompt, loading, onGenerate }: PaintingDisp
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const handleCollect = async () => {
+    if (!imageUrl || !imageId || collectLoading) return;
+    
+    setCollectLoading(true);
+    try {
+      if (!isCollected) {
+        await collectImageApi({ uuid: imageId });
+        setIsCollected(true);
+        toast.success("收藏成功");
+      } else {
+        await cancelCollectImageApi({ uuid: imageId });
+        setIsCollected(false);
+        toast.success("已取消收藏");
+      }
+    } catch (error) {
+      console.error("收藏操作失败:", error);
+      toast.error("操作失败，请重试");
+    } finally {
+      setCollectLoading(false);
+    }
   };
 
   return (
@@ -49,14 +77,32 @@ const PaintingDisplay = ({ imageUrl, prompt, loading, onGenerate }: PaintingDisp
       
       {imageUrl && (
         <div className="flex justify-between">
-          <Button 
-            variant="outline" 
-            className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
-            onClick={handleDownload}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            下载画作
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
+              onClick={handleDownload}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              下载画作
+            </Button>
+            
+            {imageId && (
+              <Button
+                variant="outline"
+                className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
+                onClick={handleCollect}
+                disabled={collectLoading}
+              >
+                {isCollected ? (
+                  <BookmarkCheck className="mr-2 h-4 w-4 text-chinese-red" />
+                ) : (
+                  <BookmarkPlus className="mr-2 h-4 w-4" />
+                )}
+                {isCollected ? "已收藏" : "收藏"}
+              </Button>
+            )}
+          </div>
           
           <Button 
             className="chinese-button"

@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 const req = axios.create({
@@ -11,9 +12,13 @@ req.interceptors.response.use(
     }
     return Promise.reject(new Error("Unexpected response status"));
   },
-  () => {}
+  (error) => {
+    return Promise.reject(error);
+  }
 );
+
 req.interceptors.request.use((requestConfig) => {
   return requestConfig;
 });
+
 export default req;

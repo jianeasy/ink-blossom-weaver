@@ -1,3 +1,4 @@
+
 import req from "./index";
 
 // 请求工作流
@@ -30,7 +31,6 @@ export const saveImageApi = (data: {
   return req.request({
     method: "post",
     url: "https://aitool.codejoyai.com/aitool_api/tool/createLog",
-    // url: "http://localhost:4040/api/tool/createLog",
     data: data,
     headers: {
       platform: "lndx",
@@ -43,8 +43,7 @@ export const saveImageApi = (data: {
 export const collectImageApi = (data: { uuid: string }) => {
   return req.request({
     method: "post",
-    // url: "https://aitool.codejoyai.com/aitool_api/tool/collection",
-    url: "http://localhost:4040/api/tool/collection",
+    url: "https://aitool.codejoyai.com/aitool_api/tool/collection",
     data: data,
     headers: {
       "Content-Type": "application/json",
@@ -57,7 +56,6 @@ export const cancelCollectImageApi = (data: { uuid: string }) => {
   return req.request({
     method: "post",
     url: "https://aitool.codejoyai.com/aitool_api/tool/cancelCollection",
-    // url: "http://localhost:4040/api/tool/cancelCollection",
     data: data,
     headers: {
       "Content-Type": "application/json",
@@ -75,7 +73,6 @@ export const getCollectImageListApi = (data: {
   return req.request({
     method: "post",
     url: "https://aitool.codejoyai.com/aitool_api/tool/collectionList",
-    // url: "http://localhost:4040/api/tool/collectionList",
     data: data,
     headers: {
       platform: "lndx",

@@ -1,6 +1,9 @@
+
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Brush, Loader2 } from "lucide-react";
+import { Brush, Loader2, BookmarkCheck } from "lucide-react";
+import { v4 as uuidv4 } from 'uuid';
 import ApiKeyInput from "@/components/ApiKeyInput";
 import StyleSelector from "@/components/StyleSelector";
 import SubjectSelector from "@/components/SubjectSelector";
@@ -15,7 +18,7 @@ import {
   PaintingSubject,
   PaintingParameters,
 } from "@/types/ChinesePainting";
-import { generateImageApi } from "@/request/api";
+import { generateImageApi, saveImageApi } from "@/request/api";
 
 const Index = () => {
   const { apiKey } = useApiKey();
@@ -24,6 +27,7 @@ const Index = () => {
     null
   );
   const [generatedPrompt, setGeneratedPrompt] = useState<string>("");
+  const [currentImageId, setCurrentImageId] = useState<string>("");
 
   // Default painting options
   const [style, setStyle] = useState<PaintingStyle>("shuimo");
@@ -64,6 +68,21 @@ const Index = () => {
       const imageUrl = JSON.parse(image)?.remote_url;
 
       setGeneratedImageUrl(imageUrl);
+      
+      // 保存生成的图像到后端
+      const imageId = uuidv4();
+      await saveImageApi({
+        toolName: "chinese-painting",
+        toolType: "generate",
+        setting: JSON.stringify({
+          uuid: imageId,
+          url: imageUrl,
+          prompt: prompt,
+          createDate: new Date().toISOString(),
+        }),
+      });
+      
+      setCurrentImageId(imageId);
       toast.success("国画创作完成！");
     } catch (error) {
       console.error("Image generation error:", error);
@@ -79,6 +98,18 @@ const Index = () => {
         <h1 className="text-4xl md:text-5xl font-heading text-chinese-red">
           国画生成器
         </h1>
+        <div className="absolute right-4 top-4">
+          <Button 
+            variant="outline" 
+            className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
+            asChild
+          >
+            <Link to="/collection">
+              <BookmarkCheck className="mr-2 h-4 w-4" />
+              我的收藏
+            </Link>
+          </Button>
+        </div>
       </header>
 
       <main className="container px-4 sm:px-6 py-8">
@@ -128,6 +159,7 @@ const Index = () => {
               prompt={generatedPrompt}
               loading={isLoading}
               onGenerate={generateImage}
+              imageId={currentImageId}
             />
           </div>
         </div>
