@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Brush, Loader2, BookmarkCheck } from "lucide-react";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import ApiKeyInput from "@/components/ApiKeyInput";
 import StyleSelector from "@/components/StyleSelector";
 import SubjectSelector from "@/components/SubjectSelector";
@@ -57,32 +56,37 @@ const Index = () => {
       setGeneratedPrompt(prompt);
       console.log("Generated prompt:", prompt);
 
-      const response = await generateImageApi({
-        inputs: {
-          prompt: prompt,
-        },
-        response_mode: "blocking",
-        user: "abc-123",
-      });
-      const image = response.data.outputs.imageUrl;
-      const imageUrl = JSON.parse(image)?.remote_url;
+      // const response = await generateImageApi({
+      //   inputs: {
+      //     prompt: prompt,
+      //   },
+      //   response_mode: "blocking",
+      //   user: "abc-123",
+      // });
+      // const image = response.data.outputs.imageUrl;
+      // const imageUrl = JSON.parse(image)?.remote_url;
+      const imageUrl =
+        "https://lobe-file.oss-cn-shanghai.aliyuncs.com/images/painting/1747621953480.png";
 
       setGeneratedImageUrl(imageUrl);
-      
+
       // 保存生成的图像到后端
-      const imageId = uuidv4();
-      await saveImageApi({
-        toolName: "chinese-painting",
-        toolType: "generate",
+      const saveResponse = await saveImageApi({
+        toolName: "ai-chinese-image-generate",
+        toolType: "ai-chinese-image-generate",
         setting: JSON.stringify({
-          uuid: imageId,
           url: imageUrl,
-          prompt: prompt,
+          style,
+          subject,
+          customSubject,
+          parameters,
+          prompt,
           createDate: new Date().toISOString(),
         }),
       });
-      
-      setCurrentImageId(imageId);
+      console.log("Save response:", saveResponse);
+      const uuid = saveResponse.data.uuid;
+      setCurrentImageId(uuid);
       toast.success("国画创作完成！");
     } catch (error) {
       console.error("Image generation error:", error);
@@ -99,8 +103,8 @@ const Index = () => {
           国画生成器
         </h1>
         <div className="absolute right-4 top-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
             asChild
           >

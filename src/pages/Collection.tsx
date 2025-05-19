@@ -1,9 +1,20 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { BookmarkCheck, Home, Loader2, ArrowLeft } from "lucide-react";
 import { getCollectImageListApi, cancelCollectImageApi } from "@/request/api";
 import { toast } from "sonner";
@@ -25,14 +36,22 @@ const Collection = () => {
   const fetchCollections = async (currentPage = page) => {
     setLoading(true);
     try {
-      const response: any = await getCollectImageListApi({
+      const response = await getCollectImageListApi({
         page: currentPage,
         pageSize,
-        toolName: "chinese-painting",
+        toolName: "ai-chinese-image-generate",
       });
 
-      if (response.code === 0 && response.data) {
-        setCollections(response.data.list || []);
+      if (response.data) {
+        const newList = response.data.list.map((item) => {
+          return {
+            ...JSON.parse(JSON.parse(item.setting).setting),
+            uuid: item.uuid,
+          };
+        });
+        console.log("newList", newList);
+
+        setCollections(newList || []);
         setTotalPages(Math.ceil((response.data.total || 0) / pageSize));
       } else {
         toast.error("获取收藏列表失败");
@@ -68,12 +87,18 @@ const Collection = () => {
   return (
     <div className="min-h-screen pb-16">
       <header className="text-center py-8 border-b border-chinese-red/30 relative animate-ink-flow">
-        <h1 className="text-4xl md:text-5xl font-heading text-chinese-red">收藏作品</h1>
+        <h1 className="text-4xl md:text-5xl font-heading text-chinese-red">
+          收藏作品
+        </h1>
       </header>
 
       <main className="container px-4 sm:px-6 py-8">
         <div className="mb-6">
-          <Button variant="outline" asChild className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10">
+          <Button
+            variant="outline"
+            asChild
+            className="border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
+          >
             <Link to="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               返回创作页
@@ -89,7 +114,10 @@ const Collection = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {collections.map((item) => (
-                <Card key={item.uuid} className="border-chinese-brown/30 overflow-hidden">
+                <Card
+                  key={item.uuid}
+                  className="border-chinese-brown/30 overflow-hidden"
+                >
                   <CardHeader className="p-4 pb-2">
                     <CardTitle className="text-lg truncate text-chinese-black">
                       {new Date(item.createDate).toLocaleDateString()}
@@ -97,17 +125,19 @@ const Collection = () => {
                   </CardHeader>
                   <CardContent className="p-4 pt-0">
                     <div className="aspect-square overflow-hidden rounded-md mb-3 bg-chinese-white/60">
-                      <img 
-                        src={item.url} 
-                        alt="收藏的国画作品" 
+                      <img
+                        src={item.url}
+                        alt="收藏的国画作品"
                         className="w-full h-full object-contain"
                       />
                     </div>
-                    <p className="text-xs text-chinese-black/70 line-clamp-2">{item.prompt}</p>
+                    <p className="text-xs text-chinese-black/70 line-clamp-2">
+                      {item.prompt}
+                    </p>
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="w-full border-chinese-brown text-chinese-black hover:bg-chinese-brown/10"
                       onClick={() => handleCancelCollect(item.uuid)}
                     >
@@ -123,9 +153,11 @@ const Collection = () => {
               <Pagination className="my-8">
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
+                    <PaginationPrevious
                       onClick={() => handlePageChange(page - 1)}
-                      className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                      className={
+                        page === 1 ? "pointer-events-none opacity-50" : ""
+                      }
                     />
                   </PaginationItem>
                   <PaginationItem>
@@ -134,9 +166,13 @@ const Collection = () => {
                     </span>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext 
+                    <PaginationNext
                       onClick={() => handlePageChange(page + 1)}
-                      className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+                      className={
+                        page === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>
