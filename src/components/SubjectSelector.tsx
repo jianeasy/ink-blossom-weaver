@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Mic, MicOff } from "lucide-react";
 import { PaintingSubject, translateSubject } from "@/types/ChinesePainting";
 
 interface SubjectSelectorProps {
@@ -23,6 +25,42 @@ const SubjectSelector = ({ value, onChange, customSubject, onCustomSubjectChange
     "orchid",
     "chrysanthemum"
   ];
+
+  const [isListening, setIsListening] = useState(false);
+  
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('您的浏览器不支持语音识别功能，请使用现代浏览器。');
+      return;
+    }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.lang = 'zh-CN';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+    
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      onCustomSubjectChange(transcript);
+    };
+    
+    recognition.onerror = (event) => {
+      console.error('语音识别错误:', event.error);
+      setIsListening(false);
+    };
+    
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+    
+    recognition.start();
+  };
 
   const handleChange = (value: string) => {
     onChange(value as PaintingSubject);
@@ -48,13 +86,25 @@ const SubjectSelector = ({ value, onChange, customSubject, onCustomSubjectChange
       
       <div className="mt-4">
         <Label htmlFor="customSubject" className="block text-chinese-black mb-2">自定义主题</Label>
-        <Input 
-          id="customSubject"
-          value={customSubject}
-          onChange={handleCustomSubjectChange}
-          placeholder="输入您想要的绘画主题"
-          className="chinese-input w-full"
-        />
+        <div className="flex items-center space-x-2">
+          <Input 
+            id="customSubject"
+            value={customSubject}
+            onChange={handleCustomSubjectChange}
+            placeholder="输入或语音输入您想要的绘画主题"
+            className="chinese-input w-full"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className={`border border-chinese-brown hover:bg-chinese-brown/10 ${isListening ? 'bg-chinese-red/10' : ''}`}
+            onClick={handleVoiceInput}
+            title="语音输入"
+          >
+            {isListening ? <MicOff className="h-4 w-4 text-chinese-red" /> : <Mic className="h-4 w-4 text-chinese-brown" />}
+          </Button>
+        </div>
       </div>
     </div>
   );
