@@ -24,10 +24,10 @@ const SubjectSelector = ({
     "flower_bird",
     "people",
     "animal",
-    "bamboo",
-    "plum_blossom",
-    "orchid",
-    "chrysanthemum",
+    // "bamboo",
+    // "plum_blossom",
+    // "orchid",
+    // "chrysanthemum",
   ];
 
   const [isListening, setIsListening] = useState(false);

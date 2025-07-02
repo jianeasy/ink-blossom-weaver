@@ -56,17 +56,17 @@ const Index = () => {
       setGeneratedPrompt(prompt);
       console.log("Generated prompt:", prompt);
 
-      // const response = await generateImageApi({
-      //   inputs: {
-      //     prompt: prompt,
-      //   },
-      //   response_mode: "blocking",
-      //   user: "abc-123",
-      // });
-      // const image = response.data.outputs.imageUrl;
-      // const imageUrl = JSON.parse(image)?.remote_url;
-      const imageUrl =
-        "https://lobe-file.oss-cn-shanghai.aliyuncs.com/images/painting/1747621953480.png";
+      const response = await generateImageApi({
+        inputs: {
+          prompt: prompt,
+        },
+        response_mode: "blocking",
+        user: "abc-123",
+      });
+      const image = response.data.outputs.imageUrl;
+      const imageUrl = JSON.parse(image)?.remote_url;
+      // const imageUrl =
+      //   "https://lobe-file.oss-cn-shanghai.aliyuncs.com/images/painting/1747621953480.png";
 
       setGeneratedImageUrl(imageUrl);
 
